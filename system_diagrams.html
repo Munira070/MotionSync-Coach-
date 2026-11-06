@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MotionSync Coach — System Diagrams</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0f;--surface:#12121a;--card:#1a1a28;--card-hover:#222235;--border:#2a2a3d;--green:#00c853;--green2:#00e676;--green-glow:rgba(0,200,83,.15);--blue:#3b82f6;--purple:#8b5cf6;--orange:#f59e0b;--red:#ef4444;--text:#f0f0f5;--text2:#9898b0;--text3:#5a5a72;--radius:16px}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden}
+.hero{text-align:center;padding:80px 24px 60px;background:linear-gradient(180deg,#0f1a12 0%,var(--bg) 100%);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-120px;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(0,200,83,.08) 0%,transparent 70%);pointer-events:none}
+.hero h1{font-size:3rem;font-weight:900;background:linear-gradient(135deg,var(--green),var(--green2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px;letter-spacing:-1px}
+.hero p{font-size:1.15rem;color:var(--text2);max-width:700px;margin:0 auto}
+.badge{display:inline-block;background:var(--green-glow);color:var(--green);font-size:.75rem;font-weight:700;padding:6px 16px;border-radius:20px;border:1px solid rgba(0,200,83,.25);margin-bottom:20px;letter-spacing:1.5px;text-transform:uppercase}
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
+.nav-tabs{display:flex;justify-content:center;gap:8px;margin:40px auto 50px;flex-wrap:wrap}
+.nav-tab{padding:12px 28px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-weight:600;font-size:.9rem;cursor:pointer;transition:all .3s}
+.nav-tab:hover{border-color:var(--green);color:var(--text)}
+.nav-tab.active{background:linear-gradient(135deg,var(--green),#00a844);color:#fff;border-color:transparent;box-shadow:0 4px 20px rgba(0,200,83,.3)}
+/* ALL sections visible by default so Mermaid can render. JS hides them after render. */
+.section{opacity:1;transition:opacity .3s}
+.section.hidden{display:none}
+.section-header{text-align:center;margin-bottom:40px}
+.section-header h2{font-size:2rem;font-weight:800;margin-bottom:8px;letter-spacing:-.5px}
+.section-header p{color:var(--text2);font-size:1rem;max-width:600px;margin:0 auto}
+.diagram-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;margin-bottom:40px;overflow-x:auto}
+.diagram-card h3{font-size:1.2rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.diagram-card h3 .icon{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem}
+.diagram-wrap{background:#ffffff;border-radius:14px;padding:30px 20px;overflow-x:auto;border:1px solid #e0e0e0}
+.explain-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-top:30px}
+.explain-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;transition:all .3s}
+.explain-card:hover{border-color:var(--green);transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,200,83,.08)}
+.explain-card h4{font-size:1rem;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.explain-card p{color:var(--text2);font-size:.88rem;line-height:1.55}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0}
+.dot-green{background:var(--green)}.dot-blue{background:var(--blue)}.dot-purple{background:var(--purple)}.dot-orange{background:var(--orange)}.dot-red{background:var(--red)}
+table.entity-table{width:100%;border-collapse:separate;border-spacing:0;margin-top:20px;font-size:.88rem}
+table.entity-table th{background:var(--surface);color:var(--green);font-weight:700;text-align:left;padding:12px 16px;border-bottom:2px solid var(--green)}
+table.entity-table td{padding:10px 16px;border-bottom:1px solid var(--border);color:var(--text2)}
+table.entity-table tr:hover td{background:var(--card-hover);color:var(--text)}
+table.entity-table code{font-family:'JetBrains Mono',monospace;font-size:.82rem;background:rgba(0,200,83,.1);color:var(--green);padding:2px 6px;border-radius:4px}
+.arch-overview{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin:30px 0}
+.arch-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;text-align:center;transition:all .3s}
+.arch-box:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.arch-box .num{font-size:2rem;font-weight:900;background:linear-gradient(135deg,var(--green),var(--green2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.arch-box .label{font-size:.85rem;color:var(--text2);margin-top:4px}
+footer{text-align:center;padding:60px 24px 40px;color:var(--text3);font-size:.85rem;border-top:1px solid var(--border);margin-top:60px}
+.loading-overlay{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;transition:opacity .5s}
+.loading-overlay.done{opacity:0;pointer-events:none}
+.spinner{width:48px;height:48px;border:4px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:768px){.hero h1{font-size:2rem}.section-header h2{font-size:1.5rem}.diagram-card{padding:16px}.explain-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- Loading screen while Mermaid renders all diagrams -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div style="color:var(--text2);font-size:.95rem">Rendering diagrams...</div>
+</div>
+
+<div class="hero">
+  <div class="badge">System Architecture Documentation</div>
+  <h1>MotionSync Coach</h1>
+  <p>AI-Powered Fitness Coaching Application — Entity Relationship &amp; Class Diagrams with detailed explanations</p>
+  <div class="arch-overview" style="max-width:900px;margin:30px auto 0">
+    <div class="arch-box"><div class="num">17</div><div class="label">Screens</div></div>
+    <div class="arch-box"><div class="num">5</div><div class="label">Services</div></div>
+    <div class="arch-box"><div class="num">9</div><div class="label">Camera Utils</div></div>
+    <div class="arch-box"><div class="num">5</div><div class="label">Data Entities</div></div>
+    <div class="arch-box"><div class="num">4</div><div class="label">Widgets</div></div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="nav-tabs" id="navTabs">
+    <div class="nav-tab active" data-target="erd">📊 ERD Diagram</div>
+    <div class="nav-tab" data-target="class">🏗️ Class Diagram</div>
+    <div class="nav-tab" data-target="entities">📋 Entity Details</div>
+    <div class="nav-tab" data-target="arch">🧩 Architecture</div>
+  </div>
+
+  <!-- ERD SECTION -->
+  <div id="erd" class="section">
+    <div class="section-header">
+      <h2>Entity Relationship Diagram</h2>
+      <p>Shows all Firestore collections, their fields, and relationships within the MotionSync Coach system</p>
+    </div>
+    <div class="diagram-card">
+      <h3><span class="icon" style="background:var(--green-glow);color:var(--green)">📊</span> Firestore Database Schema</h3>
+      <div class="diagram-wrap"><div id="erd-diagram"></div></div>
+    </div>
+
+    <div class="explain-grid">
+      <div class="explain-card"><h4><span class="dot dot-green"></span> USER</h4><p>Central entity stored at <code>users/{uid}</code> in Firestore. Contains profile info (email, name, age, gender, height, weight, fitness goal) with timestamps.</p></div>
+      <div class="explain-card"><h4><span class="dot dot-blue"></span> WORKOUT_SESSION</h4><p>Sub-collection <code>users/{uid}/workout_sessions</code>. Captures the exercise name, reps, sets, rest time, and date. References Exercise by name.</p></div>
+      <div class="explain-card"><h4><span class="dot dot-purple"></span> FORM_SESSION_RECORD</h4><p>Sub-collection <code>users/{uid}/form_session_records</code>. Stores AI form analysis — total frames analyzed, good form frames, and mistake counts.</p></div>
+      <div class="explain-card"><h4><span class="dot dot-orange"></span> BMI_RECORD</h4><p>Sub-collection <code>users/{uid}/bmi_history</code>. Tracks BMI over time with value, weight, height, and date.</p></div>
+      <div class="explain-card"><h4><span class="dot dot-red"></span> NUTRITION_PLAN</h4><p>Sub-collection <code>users/{uid}/nutrition_plans</code>. Stores meal plans with name, list of meals, and date.</p></div>
+      <div class="explain-card"><h4><span class="dot dot-green"></span> EXERCISE (In-App)</h4><p>Defined in code (not Firestore). Exercise metadata: instructions, images, GIFs, ML model paths, keypoint config, targeted muscles, correction videos.</p></div>
+    </div>
+  </div>
+
+  <!-- CLASS DIAGRAM SECTION -->
+  <div id="class" class="section">
+    <div class="section-header">
+      <h2>Class Diagram</h2>
+      <p>Complete class hierarchy showing services, models, widgets, camera utilities, and screen relationships</p>
+    </div>
+
+    <div class="diagram-card">
+      <h3><span class="icon" style="background:rgba(59,130,246,.15);color:var(--blue)">⚙️</span> Services &amp; Models Layer</h3>
+      <div class="diagram-wrap"><div id="class-services"></div></div>
+    </div>
+
+    <div class="diagram-card">
+      <h3><span class="icon" style="background:rgba(139,92,246,.15);color:var(--purple)">📸</span> Camera &amp; AI Pipeline</h3>
+      <div class="diagram-wrap"><div id="class-camera"></div></div>
+    </div>
+
+    <div class="diagram-card">
+      <h3><span class="icon" style="background:rgba(245,158,11,.15);color:var(--orange)">🖥️</span> UI Layer — Screens &amp; Widgets</h3>
+      <div class="diagram-wrap"><div id="class-ui"></div></div>
+    </div>
+  </div>
+
+  <!-- ENTITY DETAILS SECTION -->
+  <div id="entities" class="section">
+    <div class="section-header">
+      <h2>Entity Details</h2>
+      <p>Complete field-level documentation for every data entity in the system</p>
+    </div>
+    <div class="diagram-card">
+      <h3><span class="icon" style="background:var(--green-glow);color:var(--green)">👤</span> User Profile — <code>users/{uid}</code></h3>
+      <table class="entity-table"><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>uid</code></td><td>String (PK)</td><td>Firebase Auth UID — document ID</td></tr><tr><td><code>email</code></td><td>String</td><td>User's email address</td></tr><tr><td><code>displayName</code></td><td>String</td><td>User's display name</td></tr><tr><td><code>age</code></td><td>int?</td><td>User's age (nullable)</td></tr><tr><td><code>gender</code></td><td>String?</td><td>User's gender</td></tr><tr><td><code>height</code></td><td>double?</td><td>Height in cm</td></tr><tr><td><code>weight</code></td><td>int?</td><td>Weight in kg</td></tr><tr><td><code>fitnessGoal</code></td><td>String?</td><td>User's fitness goal</td></tr><tr><td><code>createdAt</code></td><td>Timestamp</td><td>Account creation time</td></tr><tr><td><code>updatedAt</code></td><td>Timestamp</td><td>Last profile update time</td></tr></table>
+    </div>
+    <div class="diagram-card">
+      <h3><span class="icon" style="background:rgba(59,130,246,.15);color:var(--blue)">🏋️</span> WorkoutSession — <code>users/{uid}/workout_sessions</code></h3>
+      <table class="entity-table"><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>exercise</code></td><td>String</td><td>Exercise name (FK to Exercise)</td></tr><tr><td><code>reps</code></td><td>int</td><td>Number of reps per set</td></tr><tr><td><code>sets</code></td><td>int</td><td>Number of sets completed</td></tr><tr><td><code>restTime</code></td><td>int</td><td>Rest time in seconds</td></tr><tr><td><code>date</code></td><td>Timestamp</td><td>Session date/time</td></tr></table>
+    </div>
+    <div class="diagram-card">
+      <h3><span class="icon" style="background:rgba(139,92,246,.15);color:var(--purple)">📊</span> FormSessionRecord — <code>users/{uid}/form_session_records</code></h3>
+      <table class="entity-table"><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>exerciseName</code></td><td>String</td><td>Name of the exercise evaluated</td></tr><tr><td><code>date</code></td><td>Timestamp</td><td>Session date/time</td></tr><tr><td><code>totalFrames</code></td><td>int</td><td>Total camera frames analyzed by AI</td></tr><tr><td><code>goodFormFrames</code></td><td>int</td><td>Frames where form was correct</td></tr><tr><td><code>mistakeCounts</code></td><td>Map</td><td>Mistake type to occurrence count</td></tr></table>
+    </div>
+    <div class="diagram-card">
+      <h3><span class="icon" style="background:rgba(245,158,11,.15);color:var(--orange)">📈</span> BMI Record — <code>users/{uid}/bmi_history</code></h3>
+      <table class="entity-table"><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>value</code></td><td>double</td><td>Calculated BMI value</td></tr><tr><td><code>weight</code></td><td>int</td><td>Weight at measurement (kg)</td></tr><tr><td><code>height</code></td><td>double</td><td>Height at measurement (cm)</td></tr><tr><td><code>date</code></td><td>Timestamp</td><td>Date of measurement</td></tr></table>
+    </div>
+    <div class="diagram-card">
+      <h3><span class="icon" style="background:rgba(239,68,68,.15);color:var(--red)">🥗</span> NutritionPlan — <code>users/{uid}/nutrition_plans</code></h3>
+      <table class="entity-table"><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>name</code></td><td>String</td><td>Plan name/title</td></tr><tr><td><code>meals</code></td><td>List</td><td>List of meal descriptions</td></tr><tr><td><code>date</code></td><td>Timestamp</td><td>Date the plan was created</td></tr></table>
+    </div>
+  </div>
+
+  <!-- ARCHITECTURE SECTION -->
+  <div id="arch" class="section">
+    <div class="section-header">
+      <h2>Architecture Overview</h2>
+      <p>How MotionSync Coach's layers interact — from UI screens down to AI and Firestore</p>
+    </div>
+    <div class="diagram-card">
+      <h3><span class="icon" style="background:var(--green-glow);color:var(--green)">🧩</span> System Architecture Flow</h3>
+      <div class="diagram-wrap"><div id="arch-diagram"></div></div>
+    </div>
+    <div class="explain-grid">
+      <div class="explain-card"><h4><span class="dot dot-green"></span> UI Layer</h4><p>17 Flutter screens handling auth flows, home dashboard, exercise selection, real-time camera workout, profile management, BMI calculator, nutrition, progress reports, and settings.</p></div>
+      <div class="explain-card"><h4><span class="dot dot-blue"></span> Service Layer</h4><p><strong>FirebaseAuthService</strong> — login/signup/Google. <strong>FirestoreService</strong> — all Firestore CRUD. <strong>SettingsService</strong> — preferences. <strong>VoiceControlService + AppVoiceControl</strong> — hands-free voice commands.</p></div>
+      <div class="explain-card"><h4><span class="dot dot-purple"></span> AI Pipeline</h4><p><strong>PoseDetector</strong> — ML Kit 33 landmarks. <strong>FormClassifier</strong> — TFLite form correctness. <strong>RepCounter</strong> — keypoint-based rep tracking. <strong>CoachTTS</strong> — audio feedback. <strong>RenderLandmarks</strong> — skeleton overlay.</p></div>
+      <div class="explain-card"><h4><span class="dot dot-orange"></span> Data Layer</h4><p><strong>Firebase Auth</strong> for authentication. <strong>Cloud Firestore</strong> for all user data. <strong>SharedPreferences</strong> for local settings. <strong>TFLite models</strong> for on-device AI.</p></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>MotionSync Coach — System Architecture Documentation</p>
+  <p style="margin-top:6px;font-size:.78rem">Generated from source code analysis &bull; Flutter + Firebase + ML Kit + TFLite</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+// Define all diagram sources as strings
+var diagrams = {
+  "erd-diagram": `erDiagram
+    USER {
+        string uid PK
+        string email
+        string displayName
+        int age
+        string gender
+        double height
+        double weight
+        string fitnessGoal
+        timestamp createdAt
+        timestamp updatedAt
+    }
+    WORKOUT_SESSION {
+        string id PK
+        string exercise
+        int reps
+        int sets
+        int restTime
+        timestamp date
+    }
+    NUTRITION_PLAN {
+        string id PK
+        string name
+        list meals
+        timestamp date
+    }
+    FORM_SESSION_RECORD {
+        string id PK
+        string exerciseName
+        timestamp date
+        int totalFrames
+        int goodFormFrames
+        map mistakeCounts
+    }
+    BMI_RECORD {
+        string id PK
+        double value
+        int weight
+        double height
+        timestamp date
+    }
+    EXERCISE {
+        string name PK
+        list instructions
+        string image
+        string gif
+        int trackedKeypoint
+        int trackingDirection
+        bool fullRepPosition
+        string formCorrectnessModel
+        list targetedMuscles
+        list correctionAdvice
+        string correctionVideoUrl
+    }
+    SETTINGS {
+        string feedbackLanguage
+        string exerciseDifficulty
+    }
+    USER ||--o{ WORKOUT_SESSION : "completes"
+    USER ||--o{ NUTRITION_PLAN : "follows"
+    USER ||--o{ FORM_SESSION_RECORD : "records"
+    USER ||--o{ BMI_RECORD : "tracks"
+    USER ||--|| SETTINGS : "configures"
+    WORKOUT_SESSION }o--|| EXERCISE : "references"
+    FORM_SESSION_RECORD }o--|| EXERCISE : "evaluates"`,
+
+  "class-services": `classDiagram
+    class FirebaseAuthService {
+        -FirebaseAuth _auth
+        +User currentUser
+        +login(email, password)
+        +signup(email, password)
+        +loginWithGoogle()
+        +sendPasswordResetEmail(email)
+        +signOut()
+    }
+    class FirestoreService {
+        -FirebaseFirestore _db
+        -FirebaseAuth _auth
+        +saveUserProfile(data)
+        +createInitialProfile()
+        +getUserProfile()
+        +saveWorkoutSession(session)
+        +getWorkoutSessions()
+        +saveNutritionPlan(plan)
+        +saveBMIRecord(bmi, weight, height)
+        +getBMIHistory()
+        +saveFormSessionRecord(record)
+        +getFormSessionRecords(limit)
+        +getProgressReport(lastSessions)
+        +updateDisplayName(name)
+    }
+    class SettingsService {
+        -SharedPreferences _prefs
+        +getFeedbackLanguageCode()
+        +setFeedbackLanguage(code)
+        +getExerciseDifficulty()
+        +setExerciseDifficulty(d)
+        +getDefaultWorkoutPreset()
+    }
+    class VoiceControlService {
+        -SpeechToText _speech
+        -bool _initialized
+        -bool _isListening
+        +initialize()
+        +startListening()
+        +stopListening()
+        +dispose()
+    }
+    class AppVoiceControl {
+        -VoiceControlService _service
+        +bool isListening
+        +setHandler(handler)
+        +start()
+        +stop()
+    }
+    class Exercise {
+        +String name
+        +List instructions
+        +String image
+        +String gif
+        +int trackedKeypoint
+        +int trackingDirection
+        +bool fullRepPosition
+        +String formCorrectnessModel
+        +List targetedMuscles
+        +List correctionAdvice
+        +String correctionVideoUrl
+    }
+    class WorkoutSession {
+        +Exercise exercise
+        +int reps
+        +int sets
+        +int restTime
+        +DateTime date
+        +toJson()
+        +fromJson(json)
+    }
+    class NutritionPlan {
+        +String name
+        +List meals
+        +DateTime date
+        +toJson()
+        +fromJson(json)
+    }
+    class FormSessionRecord {
+        +String exerciseName
+        +DateTime date
+        +int totalFrames
+        +int goodFormFrames
+        +Map mistakeCounts
+        +double accuracyPercent
+        +toJson()
+        +fromJson(json)
+    }
+    class ProgressReport {
+        +double accuracyPercent
+        +List mostCommonMistakes
+        +double previousPeriodAccuracy
+        +List recentSessions
+        +bool hasImprovement
+    }
+    AppVoiceControl --> VoiceControlService : uses
+    FirestoreService --> WorkoutSession : manages
+    FirestoreService --> NutritionPlan : manages
+    FirestoreService --> FormSessionRecord : manages
+    FirestoreService --> ProgressReport : generates
+    WorkoutSession --> Exercise : references`,
+
+  "class-camera": `classDiagram
+    class PoseDetector {
+        -PoseDetector _poseDetector
+        -Map _lastResults
+        +loadModel()
+        +estimatePose(image, rotation)
+        +close()
+    }
+    class MLKitPoseDetector {
+        -PoseDetector _poseDetector
+        +processImage(image, rotation)
+        +close()
+    }
+    class FormClassifier {
+        -Interpreter _interpreter
+        +String confidenceModel
+        +TensorBuffer outputConfidence
+        +loadModel()
+        +runModel(inferenceResults)
+    }
+    class RepCounter {
+        +int maxRepCount
+        +int currentRepCount
+        +int minAltitude
+        +int maxAltitude
+        +double midpoint
+        +CoachTTS tts
+        +warmup(warmupInferences)
+        +startCounting(location, fullRep)
+        +resetRepCount()
+    }
+    class CoachTTS {
+        +FlutterTts tts
+        -SettingsService _settings
+        +speak(text)
+    }
+    class RenderLandmarks {
+        +List inferenceList
+        +paint(canvas, size)
+        +shouldRepaint()
+    }
+    class PoseDetectorIsolate {
+        -Isolate _isolate
+        +SendPort sendPort
+        +start()
+        +stop()
+    }
+    class IsolateData {
+        +CameraImage cameraImage
+        +dynamic rotation
+        +SendPort responsePort
+    }
+    PoseDetectorIsolate --> PoseDetector : spawns
+    PoseDetectorIsolate --> IsolateData : processes
+    RepCounter --> CoachTTS : announces reps
+    CoachTTS --> SettingsService : reads language`,
+
+  "class-ui": `classDiagram
+    class MyApp {
+        +build(context)
+    }
+    class IntroPage {
+        +build(context)
+    }
+    class LoginScreen {
+        +build(context)
+    }
+    class SignupScreen {
+        +build(context)
+    }
+    class ForgotPasswordScreen {
+        +build(context)
+    }
+    class WelcomeScreen {
+        +build(context)
+    }
+    class HomeViewScreen {
+        +build(context)
+    }
+    class ExerciseSelectionScreen {
+        +build(context)
+    }
+    class CameraScreen {
+        +build(context)
+    }
+    class ProfileScreen {
+        +build(context)
+    }
+    class PersonalInfoScreen {
+        +build(context)
+    }
+    class SettingsScreen {
+        +build(context)
+    }
+    class NutritionScreen {
+        +build(context)
+    }
+    class ProgressReportScreen {
+        +build(context)
+    }
+    class CalculateBMI {
+        +build(context)
+    }
+    class CustomizedButton {
+        +String buttonText
+        +bool isLoading
+        +bool isOutlined
+    }
+    class CustomizedTextfield {
+        +TextEditingController myController
+        +bool isPassword
+    }
+    class FormFeedbackOverlay {
+        +double formScore
+        +String currentInstruction
+        +Exercise exercise
+    }
+    class ErrorCorrectionVideoOverlay {
+        +Exercise exercise
+        +String correctionMessage
+    }
+    class AppTheme {
+        +Color primaryGreen
+        +Color scaffoldDark
+        +ThemeData darkTheme
+    }
+    class Responsive {
+        +double width
+        +double height
+        +bool isCompact
+        +bool isMedium
+        +bool isExpanded
+    }
+    MyApp --> IntroPage : unauthenticated
+    MyApp --> WelcomeScreen : authenticated
+    IntroPage --> LoginScreen : navigate
+    IntroPage --> SignupScreen : navigate
+    LoginScreen --> ForgotPasswordScreen : navigate
+    WelcomeScreen --> HomeViewScreen : contains
+    HomeViewScreen --> ExerciseSelectionScreen : navigate
+    ExerciseSelectionScreen --> CameraScreen : navigate
+    CameraScreen --> FormFeedbackOverlay : overlay
+    CameraScreen --> ErrorCorrectionVideoOverlay : overlay`,
+
+  "arch-diagram": `flowchart TD
+    subgraph UI["UI Layer - Screens"]
+        A[IntroPage] --> B[LoginScreen]
+        A --> C[SignupScreen]
+        B --> D[WelcomeScreen]
+        C --> D
+        D --> E[HomeViewScreen]
+        E --> F[ExerciseSelectionScreen]
+        F --> G[CameraScreen]
+        E --> H[ProfileScreen]
+        E --> I[NutritionScreen]
+        E --> J[ProgressReportScreen]
+        E --> K[CalculateBMI]
+        E --> L[SettingsScreen]
+    end
+    subgraph SERVICES["Service Layer"]
+        S1[FirebaseAuthService]
+        S2[FirestoreService]
+        S3[SettingsService]
+        S4[VoiceControlService]
+        S5[AppVoiceControl]
+    end
+    subgraph AIPIPE["AI Camera Pipeline"]
+        P1[PoseDetector]
+        P2[FormClassifier]
+        P3[RepCounter]
+        P4[CoachTTS]
+        P5[RenderLandmarks]
+    end
+    subgraph DATA["Data Layer"]
+        DB1[(Firebase Auth)]
+        DB2[(Cloud Firestore)]
+        DB3[(SharedPreferences)]
+        DB4[(TFLite Models)]
+    end
+    G --> P1
+    P1 --> P2
+    P1 --> P3
+    P2 --> P4
+    P3 --> P4
+    P1 --> P5
+    B --> S1
+    C --> S1
+    S1 --> DB1
+    H --> S2
+    J --> S2
+    S2 --> DB2
+    L --> S3
+    S3 --> DB3
+    G --> S4
+    S5 --> S4
+    P2 --> DB4`
+};
+
+// Initialize Mermaid
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'default',
+  themeVariables: {
+    fontFamily: 'Inter, sans-serif',
+    fontSize: '13px'
+  },
+  flowchart: { htmlLabels: true, curve: 'basis' },
+  er: { fontSize: 12 }
+});
+
+// Render each diagram using mermaid.render() API
+async function renderAllDiagrams() {
+  var keys = Object.keys(diagrams);
+  for (var i = 0; i < keys.length; i++) {
+    var id = keys[i];
+    var code = diagrams[id];
+    var el = document.getElementById(id);
+    try {
+      var result = await mermaid.render('mermaid-svg-' + i, code);
+      el.innerHTML = result.svg;
+    } catch (err) {
+      el.innerHTML = '<pre style="color:red;padding:20px;">Diagram render error: ' + err.message + '</pre>';
+      console.error('Mermaid error for ' + id + ':', err);
+    }
+  }
+
+  // After all diagrams are rendered, set up tab switching
+  var sections = document.querySelectorAll('.section');
+  for (var s = 0; s < sections.length; s++) {
+    if (sections[s].id !== 'erd') {
+      sections[s].classList.add('hidden');
+    }
+  }
+
+  // Hide loading overlay
+  document.getElementById('loadingOverlay').classList.add('done');
+  setTimeout(function(){ document.getElementById('loadingOverlay').style.display = 'none'; }, 600);
+}
+
+// Tab navigation
+document.getElementById('navTabs').addEventListener('click', function(e) {
+  var tab = e.target.closest('.nav-tab');
+  if (!tab) return;
+  var target = tab.getAttribute('data-target');
+
+  document.querySelectorAll('.nav-tab').forEach(function(t){ t.classList.remove('active'); });
+  tab.classList.add('active');
+
+  document.querySelectorAll('.section').forEach(function(s){ s.classList.add('hidden'); });
+  document.getElementById(target).classList.remove('hidden');
+});
+
+// Start rendering
+renderAllDiagrams();
+</script>
+</body>
+</html>

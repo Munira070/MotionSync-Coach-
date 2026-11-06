@@ -1,0 +1,301 @@
+@startuml MotionSync_Services_Models
+skinparam backgroundColor white
+skinparam roundcorner 10
+skinparam class {
+    BackgroundColor #f8f9fa
+    ArrowColor #2c3e50
+    BorderColor #2c3e50
+}
+
+package "Services & Models Layer" {
+    class FirebaseAuthService {
+        - FirebaseAuth _auth
+        + User currentUser()
+        + login(email, password)
+        + signup(email, password)
+        + loginWithGoogle()
+        + sendPasswordResetEmail(email)
+        + signOut()
+    }
+
+    class FirestoreService {
+        - FirebaseFirestore _db
+        - FirebaseAuth _auth
+        + saveUserProfile(data)
+        + createInitialProfile()
+        + getUserProfile()
+        + saveWorkoutSession(session)
+        + getWorkoutSessions()
+        + saveNutritionPlan(plan)
+        + saveBMIRecord(bmi, weight, height)
+        + getBMIHistory()
+        + saveFormSessionRecord(record)
+        + getFormSessionRecords(limit)
+        + getProgressReport(lastSessions)
+        + updateDisplayName(name)
+    }
+
+    class SettingsService {
+        - SharedPreferences _prefs
+        + getFeedbackLanguageCode()
+        + setFeedbackLanguage(code)
+        + getExerciseDifficulty()
+        + setExerciseDifficulty(d)
+        + getDefaultWorkoutPreset()
+    }
+
+    class VoiceControlService {
+        - SpeechToText _speech
+        - bool _initialized
+        - bool _isListening
+        + initialize()
+        + startListening()
+        + stopListening()
+        + dispose()
+    }
+
+    class AppVoiceControl {
+        - VoiceControlService _service
+        + bool isListening()
+        + setHandler(handler)
+        + start()
+        + stop()
+    }
+
+    class Exercise {
+        + String name
+        + List instructions
+        + String image
+        + String gif
+        + int trackedKeypoint
+        + int trackingDirection
+        + bool fullRepPosition
+        + String formCorrectnessModel
+        + List targetedMuscles
+        + List correctionAdvice
+        + String correctionVideoUrl
+    }
+
+    class WorkoutSession {
+        + Exercise exercise
+        + int reps
+        + int sets
+        + int restTime
+        + DateTime date
+        + toJson()
+        + static fromJson(json)
+    }
+
+    class NutritionPlan {
+        + String name
+        + List meals
+        + DateTime date
+        + toJson()
+        + static fromJson(json)
+    }
+
+    class FormSessionRecord {
+        + String exerciseName
+        + DateTime date
+        + int totalFrames
+        + int goodFormFrames
+        + Map mistakeCounts
+        + double accuracyPercent()
+        + toJson()
+        + static fromJson(json)
+    }
+
+    class ProgressReport {
+        + double accuracyPercent
+        + List mostCommonMistakes
+        + double previousPeriodAccuracy
+        + List recentSessions
+        + bool hasImprovement()
+    }
+
+    AppVoiceControl --> VoiceControlService : uses
+    FirestoreService --> WorkoutSession : manages
+    FirestoreService --> NutritionPlan : manages
+    FirestoreService --> FormSessionRecord : manages
+    FirestoreService --> ProgressReport : generates
+    WorkoutSession --> Exercise : references
+}
+@enduml
+
+@startuml MotionSync_Camera_AI
+skinparam backgroundColor white
+skinparam roundcorner 10
+skinparam class {
+    BackgroundColor #f8f9fa
+    ArrowColor #2c3e50
+    BorderColor #2c3e50
+}
+
+package "Camera & AI Pipeline" {
+    class PoseDetector {
+        - mlkit_PoseDetector _poseDetector
+        - Map _lastResults
+        + loadModel()
+        + estimatePose(image, rotation)
+        + close()
+    }
+
+    class MLKitPoseDetector {
+        - PoseDetector _poseDetector
+        + processImage(image, rotation)
+        + close()
+    }
+
+    class FormClassifier {
+        - Interpreter _interpreter
+        + String confidenceModel
+        + TensorBuffer outputConfidence
+        + loadModel()
+        + runModel(inferenceResults)
+    }
+
+    class RepCounter {
+        + int maxRepCount
+        + int currentRepCount
+        + int minAltitude
+        + int maxAltitude
+        + double midpoint
+        + CoachTTS tts
+        + warmup(warmupInferences)
+        + startCounting(location, fullRep)
+        + resetRepCount()
+    }
+
+    class CoachTTS {
+        + FlutterTts tts
+        - SettingsService _settings
+        + speak(text)
+    }
+
+    class RenderLandmarks {
+        + List inferenceList
+        + paint(canvas, size)
+        + shouldRepaint()
+    }
+
+    class PoseDetectorIsolate {
+        - Isolate _isolate
+        + SendPort sendPort
+        + start()
+        + stop()
+    }
+
+    class IsolateData {
+        + CameraImage cameraImage
+        + dynamic rotation
+        + SendPort responsePort
+    }
+
+    PoseDetectorIsolate --> PoseDetector : spawns
+    PoseDetectorIsolate --> IsolateData : processes
+    RepCounter --> CoachTTS : announces reps
+    CoachTTS --> SettingsService : reads language
+}
+@enduml
+
+@startuml MotionSync_UI
+skinparam backgroundColor white
+skinparam roundcorner 10
+skinparam class {
+    BackgroundColor #f8f9fa
+    ArrowColor #2c3e50
+    BorderColor #2c3e50
+}
+
+package "UI Layer — Screens & Widgets" {
+    class MyApp {
+        + build(context)
+    }
+    class IntroPage {
+        + build(context)
+    }
+    class LoginScreen {
+        + build(context)
+    }
+    class SignupScreen {
+        + build(context)
+    }
+    class ForgotPasswordScreen {
+        + build(context)
+    }
+    class WelcomeScreen {
+        + build(context)
+    }
+    class HomeViewScreen {
+        + build(context)
+    }
+    class ExerciseSelectionScreen {
+        + build(context)
+    }
+    class CameraScreen {
+        + build(context)
+    }
+    class ProfileScreen {
+        + build(context)
+    }
+    class PersonalInfoScreen {
+        + build(context)
+    }
+    class SettingsScreen {
+        + build(context)
+    }
+    class NutritionScreen {
+        + build(context)
+    }
+    class ProgressReportScreen {
+        + build(context)
+    }
+    class CalculateBMI {
+        + build(context)
+    }
+    
+    package "Widgets & Utilities" {
+        class CustomizedButton {
+            + String buttonText
+            + bool isLoading
+            + bool isOutlined
+        }
+        class CustomizedTextfield {
+            + TextEditingController myController
+            + bool isPassword
+        }
+        class FormFeedbackOverlay {
+            + double formScore
+            + String currentInstruction
+            + Exercise exercise
+        }
+        class ErrorCorrectionVideoOverlay {
+            + Exercise exercise
+            + String correctionMessage
+        }
+        class AppTheme {
+            + Color primaryGreen
+            + Color scaffoldDark
+            + ThemeData darkTheme
+        }
+        class Responsive {
+            + double width
+            + double height
+            + bool isCompact
+            + bool isMedium
+            + bool isExpanded
+        }
+    }
+
+    MyApp --> IntroPage : unauthenticated
+    MyApp --> WelcomeScreen : authenticated
+    IntroPage --> LoginScreen : navigate
+    IntroPage --> SignupScreen : navigate
+    LoginScreen --> ForgotPasswordScreen : navigate
+    WelcomeScreen --> HomeViewScreen : contains
+    HomeViewScreen --> ExerciseSelectionScreen : navigate
+    ExerciseSelectionScreen --> CameraScreen : navigate
+    CameraScreen --> FormFeedbackOverlay : overlay
+    CameraScreen --> ErrorCorrectionVideoOverlay : overlay
+}
+@enduml

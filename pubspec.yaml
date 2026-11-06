@@ -1,0 +1,104 @@
+name: coach_ai
+description: A new Flutter project.
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.2.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Firebase
+  cloud_firestore: ^6.1.2
+  firebase_auth: ^6.1.4
+  firebase_core: ^4.4.0
+
+  cupertino_icons: ^1.0.2
+  google_fonts: ^6.1.0
+  carousel_slider: ^5.0.0
+  font_awesome_flutter: ^10.7.0
+  google_sign_in: ^6.2.1
+  curved_navigation_bar: ^1.0.3
+
+  # --- ANDROID & CAMERA --
+  camera: ^0.10.5
+  image_picker: ^1.0.4
+  permission_handler: ^11.3.1
+  
+  # --- MLKIT ---
+  google_mlkit_pose_detection: ^0.14.1
+  
+  # --- TFLITE STABLE STACK --
+  # Upgrading to 0.10.1 to support ffi >= 2.0.0 required by tflite_flutter_processing
+  tflite_flutter: ^0.12.1
+  tflite_flutter_processing: ^0.4.1
+
+  # Compatibility adjustments
+  path_provider: any
+  image: any
+  archive: any
+
+  flutter_gif: ^0.0.4
+  sensors_plus: ^4.0.2
+  fluttertoast: ^8.2.10
+  flutter_tts: ^3.8.5
+  lottie: ^3.1.0
+  intl: ^0.19.0
+  speech_to_text: ^7.0.0
+  shared_preferences: ^2.2.2
+  youtube_player_iframe: ^5.1.7
+  url_launcher: ^6.2.5
+  firebase_crashlytics: ^5.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^3.0.1
+  flutter_native_splash: ^2.3.10
+  flutter_launcher_icons: ^0.14.2
+
+# --- OVERRIDES ---
+dependency_overrides:
+  tflite_flutter: ^0.12.1
+  # Removed overrides for tflite_flutter, image, archive, camera
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/icon-v2.png"
+  min_sdk_android: 21
+  size: 128
+  web:
+    generate: true
+    image_path: "assets/icon/icon-v2.png"
+    background_color: "#363636"
+    theme_color: "#363636"
+  windows:
+    generate: true
+    image_path: "assets/icon/icon-v2.png"
+    icon_size: 48
+  macos:
+    generate: true
+    image_path: "assets/icon/icon-v2.png"
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/icon/
+    - assets/models/
+    - assets/images/nutrition2.jpg
+    - assets/images/image2.png
+    - assets/images/image3.jpg
+    - assets/images/emely.jpg
+    - assets/images/alexsandra.jpg
+    - assets/images/squat.jpg
+    - assets/images/pull_up.png
+    - assets/images/push_up.png
+    - assets/images/push_up.gif
+    - assets/images/pull_up.gif
+    - assets/images/squat.gif
